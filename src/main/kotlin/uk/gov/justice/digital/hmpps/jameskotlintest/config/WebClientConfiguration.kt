@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.templatepackagename.config
+package uk.gov.justice.digital.hmpps.jameskotlintest.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

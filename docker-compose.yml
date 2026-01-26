@@ -1,9 +1,9 @@
 services:
-  hmpps-template-kotlin:
-    image: ghcr.io/ministryofjustice/hmpps-template-kotlin:latest
+  james-kotlin-test:
+    image: ghcr.io/ministryofjustice/james-kotlin-test:latest
     networks:
       - hmpps
-    container_name: hmpps-template-kotlin
+    container_name: james-kotlin-test
     ports:
       - "8080:8080"
     healthcheck:
