@@ -35,3 +35,4 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: james-kotlin-test
+  alertSeverity: hmpps-sre-alerts-nonprod
