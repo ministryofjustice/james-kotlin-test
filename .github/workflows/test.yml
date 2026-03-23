@@ -1,6 +1,8 @@
 name: Test token value
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - '**'
 
 jobs:
   derive-token-suffix:
