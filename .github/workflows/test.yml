@@ -14,8 +14,5 @@ jobs:
           token: ${{ secrets.HMPPS_SLACK_BOT_TOKEN }}
           sre_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
         run: |
-          suffix="${token: -4}"
-          echo "NON_SRE_SLACK_TOKEN_SUFFIX=****${suffix}" >> "$GITHUB_ENV"
-
-          suffix="${sre_token: -4}"
-          echo "SRE_SLACK_TOKEN_SUFFIX=****${suffix}" >> "$GITHUB_ENV"
+          echo "NON_SRE_SLACK_TOKEN_SUFFIX=****${token: -4}" >> "$GITHUB_ENV"
+          echo "SRE_SLACK_TOKEN_SUFFIX=****${sre_token: -4}" >> "$GITHUB_ENV"
