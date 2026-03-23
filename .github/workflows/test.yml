@@ -24,3 +24,13 @@ jobs:
         run: |
           echo "NON_SRE_SLACK_TOKEN_SUFFIX=****${token: -4}" >> "$GITHUB_ENV"
           echo "SRE_SLACK_TOKEN_SUFFIX=****${sre_token: -4}" >> "$GITHUB_ENV"
+      - name: Secret fingerprint
+        shell: bash
+        env:
+          token: ${{ secrets.HMPPS_SLACK_BOT_TOKEN }}
+          sre_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+        run: |
+          fp=$(printf '%s' "$token" | sha256sum | awk '{print $1}' | cut -c1-8)
+          echo "TOKEN_FINGERPRINT=$fp" >> "$GITHUB_ENV"
+          fp=$(printf '%s' "$sre_token" | sha256sum | awk '{print $1}' | cut -c1-8)
+          echo "TOKEN_FINGERPRINT=$fp" >> "$GITHUB_ENV"
