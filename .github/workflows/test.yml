@@ -8,6 +8,14 @@ jobs:
   derive-token-suffix:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug secret presence safely
+        shell: bash
+        env:
+          token: ${{ secrets.HMPPS_SLACK_BOT_TOKEN }}
+          sre_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+        run: |
+          echo "token length: ${#token}"
+          echo "sre_token length: ${#sre_token}"
       - name: Derive token suffix for display
         shell: bash
         env:
