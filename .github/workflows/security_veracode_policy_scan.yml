@@ -7,7 +7,7 @@ on:
 jobs:
   create-artifact:
     name: Build the artifact for veracode to scan
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@5daf63fbd4be352ac1b66ae667c60ba1959e1063
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
     with:
       gradle-command: 'BUILD_NUMBER=veracode ./gradlew assemble'
       upload-build-artifacts: true
@@ -23,7 +23,7 @@ jobs:
       actions: read
       security-events: write
     name: Project security veracode policy scan
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@5daf63fbd4be352ac1b66ae667c60ba1959e1063
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
       veracode_package_artifact_name: 'build-results'
