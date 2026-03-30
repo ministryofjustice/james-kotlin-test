@@ -35,7 +35,7 @@ jobs:
       matrix:
         environments: ['dev', 'preprod', 'prod']
     name: helm lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
@@ -46,10 +46,10 @@ jobs:
     steps:
       - id: app_version
         name: Application version creators
-        uses: ministryofjustice/hmpps-github-actions/.github/actions/build-test-and-deploy/create_app_version@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+        uses: ministryofjustice/hmpps-github-actions/.github/actions/build-test-and-deploy/create_app_version@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
   gradle_verify:
     name: Validate the kotlin
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
     secrets: inherit
     with:
       gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
@@ -60,7 +60,7 @@ jobs:
   build:
     name: Build docker image from hmpps-github-actions
     if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
     needs:
       - gradle_verify
     with:
@@ -75,7 +75,7 @@ jobs:
     needs:
       - build
       - helm_lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
     secrets: inherit
     with:
       environment: 'dev'
@@ -86,7 +86,7 @@ jobs:
   #   needs:
   #     - build
   #     - deploy_dev
-  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
   #   secrets: inherit
   #   with:
   #     environment: 'preprod'
@@ -97,7 +97,7 @@ jobs:
   #   needs:
   #     - build
   #     - deploy_preprod
-  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@98fb9aaeafc7970ea88f4d8a1145a5eb7029b609 #feat/migrate_to_shared_actions
+  #   uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@feat/migrate_to_shared_actions #feat/migrate_to_shared_actions
   #   secrets: inherit
   #   with:
   #     environment: 'prod'
