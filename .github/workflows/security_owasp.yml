@@ -68,14 +68,19 @@ jobs:
       run: |
         SARIF_FILE="${{ inputs.subproject == '' && '.' || inputs.subproject }}/build/reports/dependency-check-report.sarif"
         if [ -f "$SARIF_FILE" ]; then
-          jq '.runs[0].tool.driver.rules |= map(
-            if .id | length > 255 then
-              .id |= .[0:255]
-            else
-              .
-            end
-          )' "$SARIF_FILE" > "${SARIF_FILE}.tmp" && mv "${SARIF_FILE}.tmp" "$SARIF_FILE"
-          echo "SARIF file processed: rule IDs truncated to 255 characters max"
+          # Truncate rule IDs and related identifiers to max 255 characters
+          jq '
+            .runs[0].tool.driver.rules |= map(
+              .id = (.id | if length > 255 then .[0:255] else . end) |
+              .shortDescription.text = (.shortDescription.text // "" | if length > 500 then .[0:500] else . end)
+            ) |
+            .runs[0].results |= map(
+              .ruleId = (.ruleId // "" | if length > 255 then .[0:255] else . end)
+            )
+          ' "$SARIF_FILE" > "${SARIF_FILE}.tmp" && mv "${SARIF_FILE}.tmp" "$SARIF_FILE"
+          echo "✓ SARIF file processed: rule IDs and identifiers truncated to safe lengths"
+        else
+          echo "⚠ SARIF file not found: $SARIF_FILE"
         fi
       continue-on-error: true
     # Upload Sarif file: this will attempt to upload the sarif file for private/internal repositories as well
@@ -95,14 +100,16 @@ jobs:
     - name: Prepare OWASP summary
       id: owasp-summary
       run: |
-        formatted_output=$(jq -r '.runs[0].tool.driver.rules[] | [.id, .shortDescription.text, .properties.cvssv2_score, .properties.cvssv2_severity] | @tsv' ${{ inputs.subproject == '' && '.' || inputs.subproject }}/build/reports/dependency-check-report.sarif \
-        | awk -F'\t' '{print $1" - "$NF" ("$(NF-1)") - "substr($2,index($2,":")+1)}' \
-        | awk '{printf "%s\\n", $0}') 
+        formatted_output=$(jq -r '.runs[0].tool.driver.rules[] | [.id, (.shortDescription // "N/A"), (.properties.cvssv2_score // "N/A"), (.properties.cvssv2_severity // "N/A")] | @tsv' ${{ inputs.subproject == '' && '.' || inputs.subproject }}/build/reports/dependency-check-report.sarif \
+        | awk -F'\t' '{severity=$NF; score=$(NF-1); desc=$2; id=$1; if(severity ~ /:/) severity=substr(severity, index(severity,":")+1); printf "%s - %s (%s) - %s\n", id, severity, score, desc}' \
+        | head -20) 
         echo "Vulnerability Summary"
         echo "====================="
-        echo "${formatted_output}" | sed 's/\\n/\n/g'
-        slack_summary="$(echo "${formatted_output}" | awk '{s=s $0} END {if (length(s) >= 3000) print substr(s, 1, 2997) "..."; else print s}')"
-        echo "summary=${slack_summary}" >> $GITHUB_ENV
+        echo "${formatted_output}"
+        slack_summary="$(echo "${formatted_output}" | awk '{s=s $0 "\n"} END {if (length(s) >= 3000) print substr(s, 1, 2997) "..."; else print s}')"
+        echo "summary<<EOF" >> $GITHUB_ENV
+        echo "$slack_summary" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
     - name: Gradle OWASP slack notification
       uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/slack_codescan_notification@payload_fix
       if: (failure() || steps.owasp-analyse.outcome == 'failure') && inputs.channel_id != 'NO_SLACK'
@@ -132,6 +139,26 @@ jobs:
     - name: Run gradle OWASP Dependency Check Analyse
       id: owasp-analyse
       run: ./gradlew ${{ inputs.subproject }}:dependencyCheckAnalyze --info
+      continue-on-error: true
+    # Post-process SARIF to fix rule identifier length
+    - name: Fix SARIF rule identifier length
+      run: |
+        SARIF_FILE="${{ inputs.subproject == '' && '.' || inputs.subproject }}/build/reports/dependency-check-report.sarif"
+        if [ -f "$SARIF_FILE" ]; then
+          # Truncate rule IDs and related identifiers to max 255 characters
+          jq '
+            .runs[0].tool.driver.rules |= map(
+              .id = (.id | if length > 255 then .[0:255] else . end) |
+              .shortDescription.text = (.shortDescription.text // "" | if length > 500 then .[0:500] else . end)
+            ) |
+            .runs[0].results |= map(
+              .ruleId = (.ruleId // "" | if length > 255 then .[0:255] else . end)
+            )
+          ' "$SARIF_FILE" > "${SARIF_FILE}.tmp" && mv "${SARIF_FILE}.tmp" "$SARIF_FILE"
+          echo "✓ SARIF file processed: rule IDs and identifiers truncated to safe lengths"
+        else
+          echo "⚠ SARIF file not found: $SARIF_FILE"
+        fi
       continue-on-error: true
     # Upload Sarif file: this will attempt to upload the sarif file for private/internal repositories as well
     - name: OWASP upload sarif
