@@ -1,0 +1,19 @@
+name: Security trivy dependency check
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "3 10 * * MON-FRI" # Every weekday
+
+jobs:
+  security-kotlin-snynk-check:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    name: Project security snyk dependency check
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_snyk_gradle.yml@feat/snyk_scans
+    with:
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+    secrets:
+      SNYK_SECRET: ${{ secrets.SNYK_SECRET }}
+      HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
