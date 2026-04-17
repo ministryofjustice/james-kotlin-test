@@ -1,11 +1,7 @@
 name: Security OWASP dependency check
 
-on:
+on:    
   workflow_dispatch:
-  schedule:
-    - cron: "3 10 * * MON-FRI" # Every weekday
-    
-  workflow_call:
     inputs:
       channel_id:
         description: 'The slack channel ID to send a message on failure. If this is not provided then no message is sent.'
@@ -25,12 +21,12 @@ on:
       nvd_feed_version:
         description: 'version of the NVD feed to use'
         required: false
-        default: '1'
+        default: '2'
         type: string
       java_version:
         type: string
         required: false
-        default: '21'
+        default: '25'
     secrets:
       HMPPS_SRE_SLACK_BOT_TOKEN:
         description: 'Slack bot token'
@@ -98,7 +94,7 @@ jobs:
       with:
         title: "Gradle OWASP"
         warningOnly: ${{ steps.owasp-upload-sarif.outcome == 'success' && steps.owasp-upload-artifact.outcome == 'success' }}
-        channel_id: ${{ inputs.channel_id}}
+        channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID }}
         SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
         subproject: ${{ inputs.subproject }}
         summary: ${{ inputs.slack_include_summary && env.summary || '' }}
