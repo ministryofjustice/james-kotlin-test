@@ -1,6 +1,10 @@
 name: Security OWASP dependency check
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: "3 10 * * MON-FRI" # Every weekday
+    
   workflow_call:
     inputs:
       channel_id:
