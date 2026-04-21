@@ -1,7 +1,7 @@
 name: Backup Repository to SharePoint
 
 on:
-  workflow_dispatch:      # Allow manual trigger
+  workflow_dispatch: # manual trigger replace later with cron for scheduled run
 
 jobs:
   backup:
