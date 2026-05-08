@@ -42,7 +42,7 @@ jobs:
         with:
           subproject: ''
           severity: 'HIGH,CRITICAL'
-          scan_type: 'image'
+          scan_type: 'fs'
           location: '.'
           snyk_policy_path: ''
           github_token: ${{ secrets.GITHUB_TOKEN }}
