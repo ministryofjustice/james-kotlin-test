@@ -42,7 +42,7 @@ jobs:
         with:
           subproject: ''
           severity: 'HIGH,CRITICAL'
-          scan_type: 'image'
+          scan_type: 'fs'
           location: '.'
           snyk_policy_path: ''
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,5 +57,5 @@ jobs:
           channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
           SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
           subproject: ''
-          scan_context: 'image'
+          scan_context: 'fs'
           summary: true
