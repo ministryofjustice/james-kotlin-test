@@ -38,7 +38,7 @@ jobs:
 
       - name: Run Snyk Security Scan
         id: snyk-scan
-        uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/snyk-scan@v1.0.11
+        uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/snyk-scan@add_snyk_fs_fix
         with:
           subproject: ''
           severity: 'HIGH,CRITICAL'
