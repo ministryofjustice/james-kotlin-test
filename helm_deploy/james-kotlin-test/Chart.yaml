@@ -5,8 +5,11 @@ name: james-kotlin-test
 version: 0.2.0
 dependencies:
   - name: generic-service
-    version: "3.16"
+    version: "3.12"
     repository: https://ministryofjustice.github.io/hmpps-helm-charts
   - name: generic-prometheus-alerts
     version: "1.17"
+    repository: https://ministryofjustice.github.io/hmpps-helm-charts
+  - name: envoy-forward-proxy
+    version: "1.0"
     repository: https://ministryofjustice.github.io/hmpps-helm-charts
