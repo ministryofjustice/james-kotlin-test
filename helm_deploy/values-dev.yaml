@@ -20,3 +20,4 @@ generic-prometheus-alerts:
 
 envoy-forward-proxy:
   enabled: true
+  fullnameOverride: envoy-https-proxy
