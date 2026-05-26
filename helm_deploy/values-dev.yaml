@@ -2,7 +2,7 @@
 # Per environment values which override defaults in james-kotlin-test/values.yaml
 
 generic-service:
-  replicaCount: 2
+  replicaCount: 1
 
   ingress:
     host: james-kotlin-test-dev.hmpps.service.justice.gov.uk
