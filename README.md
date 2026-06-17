@@ -6,6 +6,7 @@
 
 # james's test Kotlin project
 
+This is used to validate Kotlin deployments
 
 ## Running the application locally
 
