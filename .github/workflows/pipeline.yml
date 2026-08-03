@@ -63,7 +63,7 @@ jobs:
         run: echo "version=${{ inputs.image_version || steps.app_version.outputs.version }}" >> "$GITHUB_OUTPUT"
   gradle_verify:
     name: Validate the kotlin
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@renovate/actions-attest-4.x # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     secrets: inherit
     with:
       gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
@@ -74,7 +74,7 @@ jobs:
   build:
     name: Build docker image from hmpps-github-actions
     # if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@renovate/actions-attest-4.x # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     needs:
       - gradle_verify
       - app_version
@@ -91,7 +91,7 @@ jobs:
     needs:
       - build
       - helm_lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@renovate/actions-attest-4.x # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'dev'
