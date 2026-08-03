@@ -11,6 +11,7 @@ on:
         required: false
         default: ''
         type: string
+      
       push:
         description: Push docker image to registry flag
         required: true
@@ -60,7 +61,7 @@ jobs:
   build:
     name: Build docker image from hmpps-github-actions
     if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@tas/image_version # WORKFLOW_VERSION
     needs:
       - gradle_verify
     with:
