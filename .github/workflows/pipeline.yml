@@ -71,6 +71,7 @@ jobs:
       push: ${{ inputs.push || inputs.push == null }}
       docker_multiplatform: false
       download_build_artifacts: true
+      image_version: sandhyatest
   deploy_dev:
     name: Deploy to the development environment
     needs:
