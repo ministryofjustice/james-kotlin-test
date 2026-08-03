@@ -14,7 +14,7 @@ on:
       image_version:
         description: Image version to be used for the docker image
         required: false
-        default: 'sandhyatest'
+        default: ''
         type: string
       push:
         description: Push docker image to registry flag
@@ -72,6 +72,7 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@tas/image_version # WORKFLOW_VERSION
     needs:
       - gradle_verify
+      - app_version
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
@@ -79,7 +80,7 @@ jobs:
       push: ${{ inputs.push || inputs.push == null }}
       docker_multiplatform: false
       download_build_artifacts: true
-      image_version: sandhyatest
+      image_version: '${{ needs.app_version.outputs.version }}'
   deploy_dev:
     name: Deploy to the development environment
     needs:
