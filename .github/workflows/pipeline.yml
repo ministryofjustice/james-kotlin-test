@@ -11,7 +11,11 @@ on:
         required: false
         default: ''
         type: string
-      
+      image_version:
+        description: Image version to be used for the docker image
+        required: false
+        default: ''
+        type: string
       push:
         description: Push docker image to registry flag
         required: true
@@ -43,11 +47,15 @@ jobs:
   app_version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.app_version.outputs.version }}
+      version: ${{ steps.resolve_version.outputs.version }}
     steps:
       - id: app_version
+        if: ${{ inputs.image_version == '' }}
         name: Application version creators
         uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/build-test-and-deploy/create_app_version@c89a206b6b32888d13f6aec01af0f7694df6b42f # v1
+      - id: resolve_version
+        name: Resolve application version
+        run: echo "version=${{ inputs.image_version || steps.app_version.outputs.version }}" >> "$GITHUB_OUTPUT"
   gradle_verify:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@tas/image_version # WORKFLOW_VERSION
