@@ -14,7 +14,7 @@ on:
       image_version:
         description: Image version to be used for the docker image
         required: false
-        default: ''
+        default: 'sandhyatest'
         type: string
       push:
         description: Push docker image to registry flag
