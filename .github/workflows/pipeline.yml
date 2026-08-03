@@ -16,6 +16,11 @@ on:
         required: false
         default: ''
         type: string
+      dryrun:
+        description: Dry run flag for the pipeline
+        required: false
+        default: false
+        type: boolean
       push:
         description: Push docker image to registry flag
         required: true
@@ -58,7 +63,7 @@ jobs:
         run: echo "version=${{ inputs.image_version || steps.app_version.outputs.version }}" >> "$GITHUB_OUTPUT"
   gradle_verify:
     name: Validate the kotlin
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@tas/image_version # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@tas/helm_dryrun # WORKFLOW_VERSION
     secrets: inherit
     with:
       gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
@@ -69,7 +74,7 @@ jobs:
   build:
     name: Build docker image from hmpps-github-actions
     # if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@tas/image_version # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@tas/helm_dryrun # WORKFLOW_VERSION
     needs:
       - gradle_verify
       - app_version
@@ -86,12 +91,13 @@ jobs:
     needs:
       - build
       - helm_lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@tas/image_version # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@tas/helm_dryrun # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'dev'
       app_version: '${{ needs.build.outputs.app_version }}'
-      slack_notification: 'false' # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
+      slack_notification: 'false'
+      dryrun: ${{ inputs.dryrun }} # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
   # deploy_preprod:
   #   name: Deploy to pre-production environment
   #   needs:
