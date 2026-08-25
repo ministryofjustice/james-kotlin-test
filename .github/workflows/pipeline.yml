@@ -11,6 +11,16 @@ on:
         required: false
         default: ''
         type: string
+      image_version:
+        description: Image version to be used for the docker image
+        required: false
+        default: ''
+        type: string
+      dryrun:
+        description: Dry run flag for the pipeline
+        required: false
+        default: false
+        type: boolean
       push:
         description: Push docker image to registry flag
         required: true
@@ -42,27 +52,32 @@ jobs:
   app_version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.app_version.outputs.version }}
+      version: ${{ steps.resolve_version.outputs.version }}
     steps:
       - id: app_version
+        if: ${{ inputs.image_version == '' }}
         name: Application version creators
         uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/build-test-and-deploy/create_app_version@c89a206b6b32888d13f6aec01af0f7694df6b42f # v1
+      - id: resolve_version
+        name: Resolve application version
+        run: echo "version=${{ inputs.image_version || steps.app_version.outputs.version }}" >> "$GITHUB_OUTPUT"
   gradle_verify:
     name: Validate the kotlin
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@v2 # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     secrets: inherit
     with:
       gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
-      upload-build-artifacts: ${{ github.ref == 'refs/heads/main' }}
+      upload-build-artifacts: true
       java-version: "25"
     needs:
       - app_version
   build:
     name: Build docker image from hmpps-github-actions
-    if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    # if: github.ref == 'refs/heads/main'
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     needs:
       - gradle_verify
+      - app_version
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
@@ -70,17 +85,19 @@ jobs:
       push: ${{ inputs.push || inputs.push == null }}
       docker_multiplatform: false
       download_build_artifacts: true
+      image_version: '${{ needs.app_version.outputs.version }}'
   deploy_dev:
     name: Deploy to the development environment
     needs:
       - build
       - helm_lint
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@renovate/docker-login-action-4.x # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'dev'
       app_version: '${{ needs.build.outputs.app_version }}'
-      slack_notification: 'false' # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
+      slack_notification: 'false'
+      dryrun: ${{ inputs.dryrun }} # if 'true', it needs a valid NONPROD_RELEASES_SLACK_CHANNEL variable to be set
   # deploy_preprod:
   #   name: Deploy to pre-production environment
   #   needs:
