@@ -66,7 +66,7 @@ jobs:
       docker_registry: 'ecr'
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
       push: ${{ inputs.push || inputs.push == null }}
-      image_name: 'james-dev/james-kotlin-test'
+      image_name: 'james-kotlin-test'
       download_build_artifacts: true
       docker_multiplatform: false
       # generate_sbom: ${{ needs.check_publish.outputs.enabled == 'true' }}
