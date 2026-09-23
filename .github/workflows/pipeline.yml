@@ -72,9 +72,7 @@ jobs:
       # generate_sbom: ${{ needs.check_publish.outputs.enabled == 'true' }}
       # attach_sbom_to_registry: ${{ needs.check_publish.outputs.enabled == 'true' }}
       # sign_image: ${{ needs.check_publish.outputs.enabled == 'true' }}
-    secrets:
-      ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
-      ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+    secrets: inherit
   deploy_dev:
     name: Deploy to the development environment
     needs:
